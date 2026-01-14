@@ -1,0 +1,59 @@
+#define STOP 20
+#define ROJO 40
+#define TIEMPO_GIRO 500
+#define ANGULO_PATADA 120
+
+task main()
+{
+ // Configuración de sensores
+ SetSensorLight(IN_2);
+ SetSensorLowspeed(IN_1);
+ 
+ OnFwd(OUT_A, 0);
+
+ while(true)
+ {
+   //Pantalla
+   ClearScreen();
+   TextOut(0, LCD_LINE1, "Luz Actual:");
+   NumOut(70, LCD_LINE1, Sensor(IN_2));
+   TextOut(0, LCD_LINE2, "Distancia:");
+   NumOut(70, LCD_LINE2, SensorUS(IN_4));
+
+   // BUSCAR
+   if (SensorUS(IN_1) > STOP)
+   {
+      OnFwd(OUT_BC, 60);
+   }
+   else
+   {
+      // Obstáculo detectado
+      Off(OUT_BC);
+      Wait(300); // Pequeña pausa para estabilizar
+
+      // 2. IDENTIFICAR: ¿ES LA PELOTA ROJA?
+      if(Sensor(IN_2) > ROJO)
+      {
+         TextOut(0, LCD_LINE4, "¡GOLPEANDO!");
+
+         //SECUENCIA DE PATADA
+         //Golpe
+         RotateMotor(OUT_A, 100, ANGULO_PATADA);
+         Wait(1000);
+      }
+      //Pared
+      else
+      {
+         TextOut(0, LCD_LINE4, "PARED DETECTADA");
+
+         // Retroceder y girar
+         OnRev(OUT_BC, 50);
+         Wait(400);
+
+         OnFwd(OUT_B, 50);
+         OnRev(OUT_C, 50);
+         Wait(TIEMPO_GIRO);
+      }
+   }
+ }
+}
