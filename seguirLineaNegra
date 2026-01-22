@@ -1,0 +1,45 @@
+#define UMBRAL 45
+#define PARADA 20
+#define POTENCIA 30
+#define GIRO 3
+
+task main()
+{
+    SetSensorLight(IN_3);
+    SetSensorLowspeed(IN_4);
+
+    while(true)
+    {
+       int luz = Sensor(IN_3);
+       int distancia = SensorUS(IN_4);
+       
+       TextOut(0, LCD_LINE1, "Luz: ");
+       NumOut(40, LCD_LINE1, luz);
+       TextOut(0, LCD_LINE2, "Dist: ");
+       NumOut(40, LCD_LINE2, distancia);
+       Wait(200);
+       ClearScreen();
+       
+        if (distancia < PARADA && distancia > 1)
+        {
+            Off(OUT_BC);
+        }
+        else
+        {
+            int luz = Sensor(IN_3);
+            int error = UMBRAL - luz;
+            int ajuste = error * GIRO;
+            int pB = POTENCIA + ajuste;
+            int pC = POTENCIA - ajuste;
+
+            if(pB > 100) pB = 1000;
+             if(pB < 0) pB = 0;
+               if(pC > 100) pC = 100;
+                if(pC < 0) pC = 0;
+
+            OnFwd(OUT_B, pB);
+            OnFwd(OUT_C, pC);
+        }
+    }
+  }
+}
